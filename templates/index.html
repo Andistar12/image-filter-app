@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Image Processor</title>
+
+		<meta charset="utf-8">
+		<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+        <!--     Fonts and icons     -->
+        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+
+        <!-- Material Dashboard CSS -->
+        <link rel="stylesheet" type="text/css" href="/static/css/material-dashboard.min.css">
+
+		<script type="text/javascript" src="/static/js/core/jquery.min.js"></script>
+		<script type="text/javascript" src="/static/js/core/popper.min.js"></script>
+        <script type="text/javascript" src="/static/js/jquery.form.js"></script>
+	</head>
+	<body>
+		<nav class="navbar navbar-expand-lg bg-primary">
+			<div class="container">
+				<a class="navbar-brand" href="#">Image Processor</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-bar navbar-kebab"></span>
+					<span class="navbar-toggler-bar navbar-kebab"></span>
+					<span class="navbar-toggler-bar navbar-kebab"></span>
+				</button>
+				<div class="collapse navbar-collapse justify-content-start" id="navbarNav">
+					<ul class="navbar-nav">
+						<li class="nav-item active">
+							<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+
+        <div class="jumbotron text-center">
+            <div class="row"> 
+				<div class="col-12">
+					<h1>Image Processor App</h1>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12">
+					This app applies a filter to a given image!
+				</div>
+            </div>
+        </div>
+		<hr /><br>
+        <div class="container text-center">
+            <div class="row">
+				<div class="col-4">
+					<i class="material-icons">add_photo_alternate</i>
+					<h3>Step 1: Select image</h3>
+				</div>
+				<div class="col-4">
+					<i class="material-icons">filter</i>
+					<h3>Step 2: Select filter</h3>
+					<form>
+				</div>
+				<div class="col-4">
+					<i class="material-icons">crop_original</i>
+					<h3>Step 3: See results</h3>
+				</div>
+			</div>
+        </div>
+
+		<div class="container text-center">
+			<form id="submit_form" method="post" enctype="multipart/form-data">
+				<div class="row">
+					<div class="col-4">
+						<div class="custom-file text-left">
+							<input type="file" name="file" accept="image/*" class="custom-file-input" id="input_file">
+							<label class="custom-file-label" for="input_file">Choose file</label>
+						</div>
+					</div>
+					<div class="col-4">
+						<div class="form-group">
+							<select class="form-control selectpicker" data-style="btn btn-link" id="input_filter">
+								<option>Greyscale</option>
+								<option>Invert</option>
+							</select>
+						</div>
+					</div>
+					<div class="col-4">
+						<div class="form-group">
+                            <button type="button" class="btn btn-primary" onclick="btn_submit()">Submit Image</input>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+		<br><hr /><br>
+		<div class="container text-center">
+			<div class="row">
+				<div class="col-6">
+					<figure class="figure">
+						<img id="input_image" src="#" alt="your image" style="width: 100%"/>
+						<figcaption class="figure-caption">Your input image</figcaption>
+					</figure>
+				</div>
+				<div class="col-6">
+					<figure class="figure">
+						<img id="output_image" src="#" alt="rendered image" style="width: 100%"/>
+						<figcaption class="figure-caption">Your output image</figcaption>
+					</figure>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript" src="/static/js/core/bootstrap-material-design.min.js"></script>
+
+		<script type="text/javascript">
+			console.log("Test");
+            
+            function btn_submit() {
+                var form = $("#submit_form")
+                var url = form.attr("action");
+                var form_data = new FormData();
+                form_data.append("filter", $("#input_filter").val());
+
+                if (input_file.files && input_file.files[0]) {
+                    form_data.append("image", input_file.files[0]);
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "/process",
+                    data: form_data,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if ("error" in response) {
+                            alert(response["error"]);
+                        } else {
+                            res = response["resource"];
+                            $("#output_image").attr("src", res);
+                        }
+                    }
+                });
+            }
+
+			$(document).ready(function() {
+				// File preview
+				$("#input_file").on("change", function() {
+                    var input_file = document.getElementById("input_file");
+					var fileName = $(this).val().split("\\").pop();
+					$(this).siblings(".custom-file-label").addClass("select").html(fileName);
+
+                    if (input_file.files && input_file.files[0]) {
+                        var reader = new FileReader();
+                        reader.onload = function(e) {
+                            $("#input_image").attr("src", e.target.result);
+                        }
+                        reader.readAsDataURL(input_file.files[0]);
+                    }
+				});
+			});
+		</script>
+	</body>
+</html>
