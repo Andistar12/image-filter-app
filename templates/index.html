@@ -137,7 +137,7 @@
                         if ("error" in response) {
                             alert(response["error"]);
                         } else {
-                            res = response["resource"];
+                            var res = response["resource"] + "?time=" + (new Date()).getTime();
                             $("#output_image").attr("src", res);
                         }
                     }

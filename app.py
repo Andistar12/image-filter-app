@@ -83,13 +83,16 @@ def process():
 
     # Save file
     filename = "static/image" + secure_filename(f.filename)
+    try:
+        os.remove(filename)
+    except:
+        pass
     f.save(filename)
 
     # Run filter
     if filt == "invert":
         try:
-            pass
-            #ImageOps.invert(Image.open(filename)).save(filename)
+            ImageOps.invert(Image.open(filename)).save(filename)
         except Exception as e:
             app.logger.debug(e)
             return flask.jsonify({
@@ -172,9 +175,13 @@ def process():
                 "error": "Error occurred applying filter"
             })
 
-    return flask.jsonify({
+    resp = flask.jsonify({
         "resource": "/" + filename
     })
+    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = 0
+    return resp
 
 # ----------------------------------
 # Init
