@@ -10,3 +10,4 @@ start:
 
 stop:
 	-docker rm web-proj
+	-docker rmi web

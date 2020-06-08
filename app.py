@@ -10,6 +10,7 @@ import logging
 import hashlib
 from werkzeug.utils import secure_filename
 import os
+import traceback
 
 # ----------------------------------
 # Globals
@@ -20,7 +21,7 @@ app.logger.setLevel(logging.DEBUG)
 app.port = 5000
 
 ALLOWED_EXTENSIONS = ["png", "jpeg", "jpg"]
-ALLOWED_FILTERS = ["invert"]
+ALLOWED_FILTERS = ["invert", "rgb"]
 
 # ----------------------------------
 # Frontend
@@ -49,6 +50,7 @@ def allowed_file(filename):
 @app.route("/process", methods=["POST"])
 def process():
     app.logger.debug("Received request to process image")
+    app.logger.debug(dict(request.form))
 
     if "filter" not in request.form:
         return flask.jsonify({
@@ -86,9 +88,45 @@ def process():
     # Run filter
     if filt == "invert":
         try:
-            ImageOps.invert(Image.open(filename)).save(filename)
+            pass
+            #ImageOps.invert(Image.open(filename)).save(filename)
         except Exception as e:
             app.logger.debug(e)
+            return flask.jsonify({
+                "error": "Error occurred applying filter"
+            })
+    elif filt == "rgb":
+        try:
+            red = [0, 255, 0, 0]
+            green = [0, 0, 255, 0]
+            blue = [0, 0, 0, 255]
+            color_list = [red, green, blue]
+            im = Image.open(filename)
+            pixels = im.load()
+            width, height = im.size
+
+            for i in range(width):
+                for j in range(height):
+                    index = 0
+                    for x in range(len(color_list)):
+                        smallest = 255
+
+                        R_VAL = (pixels[i,j])[0] - (color_list[x][1])
+                        G_VAL = (pixels[i,j])[1] - (color_list[x][2])
+                        B_VAL = (pixels[i,j])[2] - (color_list[x][3])
+                        final_val = abs(R_VAL) + abs(G_VAL) + abs(B_VAL)
+
+                        dfz = final_val
+
+                        if dfz < smallest:
+                            smallest = dfz
+                            index = x
+
+                    pixels[i,j] = (color_list[index][1], color_list[index][2], color_list[index][3])
+            im.save(filename)
+
+        except Exception as e:
+            app.logger.debug(traceback.format_exc())
             return flask.jsonify({
                 "error": "Error occurred applying filter"
             })
