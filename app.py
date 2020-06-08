@@ -139,6 +139,7 @@ def process():
             emb_mid_creme = [0,209,193,171]
             emb_mid_light_beige = [0,242,235,225]
             emb_off_white = [0,247,240,230]
+            emb_creme = [0, 255, 249, 244]
 
             color_list = [emb_dark_grey,emb_light_grey, emb_creme, emb_dark_creme, emb_mid_creme, emb_off_white, emb_mid_light_beige]
             im = Image.open(filename)
