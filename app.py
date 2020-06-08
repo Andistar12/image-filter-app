@@ -132,10 +132,15 @@ def process():
             })
     elif filt == "beige":
         try:
-            red = [0, 255, 0, 0]
-            green = [0, 0, 255, 0]
-            blue = [0, 0, 0, 255]
-            color_list = [red, green, blue]
+            emb_dark_grey = [0,65,65,65]
+            emb_light_grey = [0,120,120,120]
+            emb_dark_brown = [0,48,46,42]
+            emb_dark_creme = [0,173,159,139]
+            emb_mid_creme = [0,209,193,171]
+            emb_mid_light_beige = [0,242,235,225]
+            emb_off_white = [0,247,240,230]
+
+            color_list = [emb_dark_grey,emb_light_grey, emb_creme, emb_dark_creme, emb_mid_creme, emb_off_white, emb_mid_light_beige]
             im = Image.open(filename)
             pixels = im.load()
             width, height = im.size
